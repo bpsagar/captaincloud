@@ -1,14 +1,13 @@
 import unittest
-from captaincloud.task.input import FloatInput, IntegerInput, StringInput
-from captaincloud.task.input import ValueInput
-from captaincloud.task.mixin import InvalidValueException
+from captaincloud.task.field import FloatField, IntegerField, StringField
+from captaincloud.task.field import ValueField, InvalidValueException
 
 
-class TestInput(unittest.TestCase):
-    """Tests for inputs"""
+class TestFields(unittest.TestCase):
+    """Tests for fields"""
 
     def test_float_input(self):
-        instance = FloatInput()
+        instance = FloatField()
         self.assertEqual(instance.get(), None)
 
         instance.set(1)
@@ -20,11 +19,11 @@ class TestInput(unittest.TestCase):
         with self.assertRaises(InvalidValueException):
             instance.set('ABC')
 
-        instance = FloatInput(default=2.5)
+        instance = FloatField(default=2.5)
         self.assertEqual(instance.get(), 2.5)
 
     def test_integer_input(self):
-        instance = IntegerInput()
+        instance = IntegerField()
         self.assertEqual(instance.get(), None)
 
         instance.set(1)
@@ -36,11 +35,11 @@ class TestInput(unittest.TestCase):
         with self.assertRaises(InvalidValueException):
             instance.set('ABC')
 
-        instance = IntegerInput(default=2)
+        instance = IntegerField(default=2)
         self.assertEqual(instance.get(), 2)
 
     def test_string_input(self):
-        instance = StringInput()
+        instance = StringField()
         self.assertEqual(instance.get(), None)
 
         instance.set('ABC')
@@ -52,18 +51,18 @@ class TestInput(unittest.TestCase):
         with self.assertRaises(InvalidValueException):
             instance.set(1.5)
 
-        instance = StringInput(default='ABC')
+        instance = StringField(default='ABC')
         self.assertEqual(instance.get(), 'ABC')
 
     def test_new_input(self):
 
-        class NewInput(ValueInput):
+        class NewField(ValueField):
             pass
 
         with self.assertRaises(NotImplementedError):
-            instance = NewInput()
+            instance = NewField()
             instance.set(10)
 
         with self.assertRaises(NotImplementedError):
-            instance = NewInput()
+            instance = NewField()
             instance.get()
