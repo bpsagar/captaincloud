@@ -24,6 +24,12 @@ class TestFields(unittest.TestCase):
         instance = FloatField(default=2.5)
         self.assertEqual(instance.get(), 2.5)
 
+        instance1 = FloatField(default=2.5)
+        instance2 = instance1.clone()
+        self.assertEqual(instance1.get(), instance2.get())
+        instance1.set(4.0)
+        self.assertNotEqual(instance1.get(), instance2.get())
+
     def test_integer_field(self):
         instance = IntegerField()
         self.assertEqual(instance.get(), None)
