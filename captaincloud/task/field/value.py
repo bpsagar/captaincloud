@@ -68,3 +68,21 @@ class FloatField(ValueField):
 
     def get(self):
         return self._value
+
+
+class BooleanField(ValueField):
+    """Boolean field class"""
+
+    def __init__(self, default=None):
+        super(BooleanField, self).__init__()
+        self._value = None
+        if default is not None:
+            self.set(value=default)
+
+    def set(self, value):
+        if not isinstance(value, bool):
+            raise InvalidValueException('Expected a boolean')
+        self._value = value
+
+    def get(self):
+        return self._value

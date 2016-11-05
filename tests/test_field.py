@@ -1,5 +1,7 @@
 import unittest
-from captaincloud.task.field import FloatField, IntegerField, StringField
+from captaincloud.task.field import (
+    FloatField, IntegerField, StringField, BooleanField
+)
 from captaincloud.task.field import ValueField, InvalidValueException
 
 
@@ -54,8 +56,18 @@ class TestFields(unittest.TestCase):
         instance = StringField(default='ABC')
         self.assertEqual(instance.get(), 'ABC')
 
-    def test_new_field(self):
+    def test_boolean_field(self):
+        instance = BooleanField(default=False)
+        self.assertEqual(instance.get(), False)
 
+        with self.assertRaises(InvalidValueException):
+            instance.set('True')
+
+        instance = BooleanField()
+        instance.set(True)
+        self.assertEqual(instance.get(), True)
+
+    def test_new_field(self):
         class NewField(ValueField):
             pass
 
