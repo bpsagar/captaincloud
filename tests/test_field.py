@@ -6,7 +6,7 @@ from captaincloud.task.field import ValueField, InvalidValueException
 class TestFields(unittest.TestCase):
     """Tests for fields"""
 
-    def test_float_input(self):
+    def test_float_field(self):
         instance = FloatField()
         self.assertEqual(instance.get(), None)
 
@@ -22,7 +22,7 @@ class TestFields(unittest.TestCase):
         instance = FloatField(default=2.5)
         self.assertEqual(instance.get(), 2.5)
 
-    def test_integer_input(self):
+    def test_integer_field(self):
         instance = IntegerField()
         self.assertEqual(instance.get(), None)
 
@@ -38,7 +38,7 @@ class TestFields(unittest.TestCase):
         instance = IntegerField(default=2)
         self.assertEqual(instance.get(), 2)
 
-    def test_string_input(self):
+    def test_string_field(self):
         instance = StringField()
         self.assertEqual(instance.get(), None)
 
@@ -54,7 +54,7 @@ class TestFields(unittest.TestCase):
         instance = StringField(default='ABC')
         self.assertEqual(instance.get(), 'ABC')
 
-    def test_new_input(self):
+    def test_new_field(self):
 
         class NewField(ValueField):
             pass
