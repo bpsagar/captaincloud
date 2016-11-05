@@ -22,7 +22,7 @@ class StringField(ValueField):
     def __init__(self, default=None):
         super(StringField, self).__init__()
         self._value = None
-        if default:
+        if default is not None:
             self.set(value=default)
 
     def set(self, value):
@@ -40,7 +40,7 @@ class IntegerField(ValueField):
     def __init__(self, default=None):
         super(IntegerField, self).__init__()
         self._value = None
-        if default:
+        if default is not None:
             self.set(value=default)
 
     def set(self, value):
@@ -58,7 +58,7 @@ class FloatField(ValueField):
     def __init__(self, default=None):
         super(FloatField, self).__init__()
         self._value = None
-        if default:
+        if default is not None:
             self.set(value=default)
 
     def set(self, value):
