@@ -41,3 +41,11 @@ class TestFields(unittest.TestCase):
         self.assertEqual(task.Output.floating, 5.5)
         with self.assertRaises(InvalidValueException):
             task.Output.floating = 'ABCD'
+
+        task2 = RandomTask()
+        self.assertEqual(task2.Input.string, 'ABCD')
+        task2.Input.string = '123'
+        self.assertEqual(task2.Input.string, '123')
+
+        # Test if the tasks share the same fields
+        self.assertEqual(task.Input.string, 'XYZ')
