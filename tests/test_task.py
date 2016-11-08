@@ -8,8 +8,7 @@ from captaincloud.task.registry import TaskRegistry
 class TestFields(unittest.TestCase):
     """Tests for tasks"""
 
-    def test_task(self):
-
+    def setUp(self):
         @TaskRegistry.register
         class RandomTask(Task):
             ID = 'random'
@@ -22,7 +21,11 @@ class TestFields(unittest.TestCase):
             class Output:
                 floating = field.FloatField(default=1.5)
 
-        task = RandomTask()
+        self.RandomTask = RandomTask
+
+    def test_task_fields(self):
+
+        task = self.RandomTask()
 
         self.assertEqual(task.Input.string, 'ABCD')
         task.Input.string = 'XYZ'
@@ -42,10 +45,73 @@ class TestFields(unittest.TestCase):
         with self.assertRaises(InvalidValueException):
             task.Output.floating = 'ABCD'
 
-        task2 = RandomTask()
+        task2 = self.RandomTask()
         self.assertEqual(task2.Input.string, 'ABCD')
         task2.Input.string = '123'
         self.assertEqual(task2.Input.string, '123')
 
         # Test if the tasks share the same fields
         self.assertEqual(task.Input.string, 'XYZ')
+
+    def test_task_serialize(self):
+        task = self.RandomTask()
+        serialized = {
+            'ID': 'random',
+            'Input': {
+                'string': 'ABCD',
+                'integer': 5
+            },
+            'Output': {
+                'floating': 1.5
+            }
+        }
+        self.assertEqual(task.serialize(), serialized)
+
+        task = self.RandomTask()
+        task.Input.string = 'XYZ'
+        task.Input.integer = 10
+        task.Output.floating = 2.5
+        serialized = {
+            'ID': 'random',
+            'Input': {
+                'string': 'XYZ',
+                'integer': 10
+            },
+            'Output': {
+                'floating': 2.5
+            }
+        }
+        self.assertEqual(task.serialize(), serialized)
+
+    def test_task_deserialize(self):
+        serialized = {
+            'ID': 'random',
+            'Input': {
+                'string': 'ABCD',
+                'integer': 5
+            },
+            'Output': {
+                'floating': 1.5
+            }
+        }
+        instance = Task.deserialize(data=serialized)
+        self.assertTrue(isinstance(instance, self.RandomTask))
+        self.assertEqual(instance.Input.string, 'ABCD')
+        self.assertEqual(instance.Input.integer, 5)
+        self.assertEqual(instance.Output.floating, 1.5)
+
+        serialized = {
+            'ID': 'random',
+            'Input': {
+                'string': 'XYZ',
+                'integer': 10
+            },
+            'Output': {
+                'floating': 2.5
+            }
+        }
+        instance = Task.deserialize(data=serialized)
+        self.assertTrue(isinstance(instance, self.RandomTask))
+        self.assertEqual(instance.Input.string, 'XYZ')
+        self.assertEqual(instance.Input.integer, 10)
+        self.assertEqual(instance.Output.floating, 2.5)

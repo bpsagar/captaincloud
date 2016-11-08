@@ -35,6 +35,13 @@ class FieldSet(object):
             new_dct[attr] = cls.make_field_property(field_name=attr)
         return type('FieldSetClass', (cls,), new_dct)
 
+    def serialize(self):
+        """Serialize fieldset"""
+        data = {}
+        for field in self._fields:
+            data[field] = getattr(self, field)
+        return data
+
 
 class TaskMeta(type):
     """Meta class for tasks"""
