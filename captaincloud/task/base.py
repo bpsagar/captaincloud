@@ -34,3 +34,9 @@ class Task(object):
             for field, value in fields.items():
                 setattr(FieldSet, field, value)
         return instance
+
+    def run(self):
+        """Execute the task. Instantiate a TaskImpl instance and pass self
+        to give access to input and output fields"""
+        task_impl = self.impl(task=self)
+        task_impl.run()
