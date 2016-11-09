@@ -23,8 +23,16 @@ class TestFields(unittest.TestCase):
 
         self.RandomTask = RandomTask
 
-    def test_task_fields(self):
+    def test_task_init(self):
+        task = self.RandomTask(string='XYZ', integer=10)
+        self.assertEqual(task.Input.string, 'XYZ')
+        self.assertEqual(task.Input.integer, 10)
 
+        task.set_input(string='DEF', integer=20)
+        self.assertEqual(task.Input.string, 'DEF')
+        self.assertEqual(task.Input.integer, 20)
+
+    def test_task_fields(self):
         task = self.RandomTask()
 
         self.assertEqual(task.Input.string, 'ABCD')

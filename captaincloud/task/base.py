@@ -7,12 +7,21 @@ from .registry import TaskRegistry
 class Task(object):
     """Base class for tasks"""
 
-    def __new__(cls):
+    def __new__(cls, **kwargs):
         """Instantiate and set fieldsets"""
         instance = super(Task, cls).__new__(cls)
         for name, fieldset in cls.__fieldsets__.items():
             setattr(instance, name, fieldset())
         return instance
+
+    def __init__(self, **kwargs):
+        """Initialize all input fields"""
+        self.set_input(**kwargs)
+
+    def set_input(self, **kwargs):
+        """Set values for input fields"""
+        for name, value in kwargs.items():
+            setattr(self.Input, name, value)
 
     def serialize(self):
         """Serialize the Task instance"""
