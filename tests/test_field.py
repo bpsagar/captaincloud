@@ -1,6 +1,8 @@
+import six
 import unittest
+
 from captaincloud.task.field import (
-    FloatField, IntegerField, StringField, BooleanField
+    FloatField, IntegerField, StringField, ByteField, BooleanField
 )
 from captaincloud.task.field import ValueField, InvalidValueException
 
@@ -50,8 +52,8 @@ class TestFields(unittest.TestCase):
         instance = StringField()
         self.assertEqual(instance.get(), None)
 
-        instance.set('ABC')
-        self.assertEqual(instance.get(), 'ABC')
+        instance.set(six.u('ABC'))
+        self.assertEqual(instance.get(), six.u('ABC'))
 
         with self.assertRaises(InvalidValueException):
             instance.set(1)
@@ -59,8 +61,30 @@ class TestFields(unittest.TestCase):
         with self.assertRaises(InvalidValueException):
             instance.set(1.5)
 
-        instance = StringField(default='ABC')
-        self.assertEqual(instance.get(), 'ABC')
+        with self.assertRaises(InvalidValueException):
+            instance.set(six.b('ABC'))
+
+        instance = StringField(default=six.u('ABC'))
+        self.assertEqual(instance.get(), six.u('ABC'))
+
+    def test_byte_field(self):
+        instance = ByteField()
+        self.assertEqual(instance.get(), None)
+
+        instance.set(six.b('ABC'))
+        self.assertEqual(instance.get(), six.b('ABC'))
+
+        with self.assertRaises(InvalidValueException):
+            instance.set(1)
+
+        with self.assertRaises(InvalidValueException):
+            instance.set(1.5)
+
+        with self.assertRaises(InvalidValueException):
+            instance.set(six.u('ABC'))
+
+        instance = ByteField(default=six.b('ABC'))
+        self.assertEqual(instance.get(), six.b('ABC'))
 
     def test_boolean_field(self):
         instance = BooleanField(default=False)

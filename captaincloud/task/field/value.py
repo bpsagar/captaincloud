@@ -1,5 +1,7 @@
 from .base import Field
 
+import six
+
 
 class InvalidValueException(Exception):
     """Exception raised when an invalid value is set"""
@@ -26,8 +28,26 @@ class StringField(ValueField):
             self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, six.text_type):
             raise InvalidValueException('Expected a string')
+        self._value = value
+
+    def get(self):
+        return self._value
+
+
+class ByteField(ValueField):
+    """Byte field class"""
+
+    def __init__(self, default=None):
+        super(ByteField, self).__init__()
+        self._value = None
+        if default is not None:
+            self.set(value=default)
+
+    def set(self, value):
+        if not isinstance(value, six.binary_type):
+            raise InvalidValueException('Expected bytes')
         self._value = value
 
     def get(self):
