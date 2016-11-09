@@ -39,5 +39,6 @@ class FieldSet(object):
         """Serialize fieldset"""
         data = {}
         for field in self._fields:
-            data[field] = getattr(self, field)
+            field_type = self.__fields__.get(field)
+            data[field] = field_type.serialize(getattr(self, field))
         return data

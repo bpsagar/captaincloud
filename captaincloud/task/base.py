@@ -41,7 +41,8 @@ class Task(object):
             fields = data[fieldset]
             FieldSet = getattr(instance, fieldset)
             for field, value in fields.items():
-                setattr(FieldSet, field, value)
+                field_type = FieldSet.__fields__.get(field)
+                setattr(FieldSet, field, field_type.deserialize(value))
         return instance
 
     def run(self):
