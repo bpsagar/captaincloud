@@ -2,13 +2,16 @@ import six
 import unittest
 
 from captaincloud.task.field import (
-    FloatField, IntegerField, StringField, ByteField, BooleanField
+    FloatField, IntegerField, StringField, ByteField, BooleanField,
+    StreamField, StringStreamField, ByteStreamField
 )
-from captaincloud.task.field import ValueField, InvalidValueException
+from captaincloud.task.field import (
+    ValueField, InvalidValueException, StreamNotAvailableException
+)
 
 
-class TestFields(unittest.TestCase):
-    """Tests for fields"""
+class TestValueFields(unittest.TestCase):
+    """Tests for value fields"""
 
     def test_float_field(self):
         instance = FloatField()
@@ -108,3 +111,78 @@ class TestFields(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             instance = NewField()
             instance.get()
+
+
+class TestStreamFields(unittest.TestCase):
+    """Tests for stream fields"""
+
+    def test_string_stream(self):
+        instance = StringStreamField()
+        with self.assertRaises(StreamNotAvailableException):
+            instance.write(six.u('hello'))
+
+        with self.assertRaises(StreamNotAvailableException):
+            instance.read()
+
+        class DummyStream(object):
+            def __init__(self):
+                self.buffer = six.u('')
+
+            def read(self, n=-1):
+                if n == -1:
+                    n = len(self.buffer)
+                result = self.buffer[:n]
+                self.buffer = self.buffer[n:]
+                return result
+
+            def write(self, data):
+                self.buffer += data
+
+        instance.set_real_stream(DummyStream())
+        with self.assertRaises(InvalidValueException):
+            instance.write(six.b('hello'))
+
+        instance.write(six.u('hello'))
+        self.assertEqual(instance.read(), six.u('hello'))
+
+    def test_byte_stream(self):
+        instance = ByteStreamField()
+        with self.assertRaises(StreamNotAvailableException):
+            instance.write(six.u('hello'))
+
+        with self.assertRaises(StreamNotAvailableException):
+            instance.read()
+
+        class DummyStream(object):
+            def __init__(self):
+                self.buffer = six.b('')
+
+            def read(self, n=-1):
+                if n == -1:
+                    n = len(self.buffer)
+                result = self.buffer[:n]
+                self.buffer = self.buffer[n:]
+                return result
+
+            def write(self, data):
+                self.buffer += data
+
+        instance.set_real_stream(DummyStream())
+        with self.assertRaises(InvalidValueException):
+            instance.write(six.u('hello'))
+
+        instance.write(six.b('hello'))
+        self.assertEqual(instance.read(), six.b('hello'))
+
+    def test_force_stream_validate(self):
+        class MyStreamField(StreamField):
+            pass
+
+        class DummyStream(object):
+            pass
+
+        instance = MyStreamField()
+        instance.set_real_stream(DummyStream())
+
+        with self.assertRaises(NotImplementedError):
+            instance.write(six.u('hello'))

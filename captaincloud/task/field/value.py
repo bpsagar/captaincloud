@@ -1,11 +1,7 @@
 from .base import Field
+from .exc import InvalidValueException
 
 import six
-
-
-class InvalidValueException(Exception):
-    """Exception raised when an invalid value is set"""
-    pass
 
 
 class ValueField(Field):
