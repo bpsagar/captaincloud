@@ -26,12 +26,12 @@ class TestFields(unittest.TestCase):
         self.RandomTask = RandomTask
 
     def test_task_init(self):
-        task = self.RandomTask(string='XYZ', integer=10)
-        self.assertEqual(task.Input.string, 'XYZ')
+        task = self.RandomTask(string=six.u('XYZ'), integer=10)
+        self.assertEqual(task.Input.string, six.u('XYZ'))
         self.assertEqual(task.Input.integer, 10)
 
-        task.set_input(string='DEF', integer=20)
-        self.assertEqual(task.Input.string, 'DEF')
+        task.set_input(string=six.u('DEF'), integer=20)
+        self.assertEqual(task.Input.string, six.u('DEF'))
         self.assertEqual(task.Input.integer, 20)
 
     def test_task_fields(self):
