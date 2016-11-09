@@ -1,4 +1,4 @@
-from .field import Field
+from .field import Field, StreamField, ValueField
 
 
 class FieldSet(object):
@@ -11,7 +11,7 @@ class FieldSet(object):
             self._fields[name] = field.clone()
 
     @staticmethod
-    def make_field_property(field_name):
+    def make_value_field_property(field_name):
         """Returns a property function for a field"""
 
         def _set(self, value):
@@ -31,8 +31,11 @@ class FieldSet(object):
             field = getattr(fieldset_class, attr)
             if not isinstance(field, Field):
                 continue
-            new_dct['__fields__'][attr] = field
-            new_dct[attr] = cls.make_field_property(field_name=attr)
+            if isinstance(field, ValueField):
+                new_dct['__fields__'][attr] = field
+                new_dct[attr] = cls.make_value_field_property(field_name=attr)
+            elif isinstance(field, StreamField):
+                pass  # TODO: Implement
         return type('FieldSetClass', (cls,), new_dct)
 
     def serialize(self):

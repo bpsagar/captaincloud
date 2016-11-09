@@ -19,9 +19,11 @@ class TestFields(unittest.TestCase):
             class Input:
                 string = field.StringField(default=six.u('ABCD'))
                 integer = field.IntegerField(default=5)
+                instream = field.StringStreamField()
 
             class Output:
                 floating = field.FloatField(default=1.5)
+                outstream = field.ByteStreamField()
 
         self.RandomTask = RandomTask
 
