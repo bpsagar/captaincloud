@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name='captaincloud',
@@ -7,7 +7,7 @@ setup(
     url='https://github.com/bpsagar/captaincloud',
     author='Sagar Chakravarthy',
     license='MIT',
-    packages=['captaincloud'],
+    packages=find_packages(exclude=('tests',)),
     install_requires=[
         'six'
     ],
