@@ -65,6 +65,12 @@ class TestFields(unittest.TestCase):
         # Test if the tasks share the same fields
         self.assertEqual(task.Input.string, six.u('XYZ'))
 
+        self.assertIsInstance(task.Input.instream, field.StringStreamField)
+        self.assertIsInstance(task.Output.outstream, field.ByteStreamField)
+
+        # Check if it's cloned
+        self.assertNotEqual(task.Input.instream, task2.Input.instream)
+
     def test_task_serialize(self):
         task = self.RandomTask()
         serialized = {
