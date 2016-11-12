@@ -2,7 +2,7 @@ import six
 import unittest
 
 from captaincloud.task.field import (
-    FloatField, IntegerField, StringField, ByteField, BooleanField,
+    FloatField, IntegerField, StringField, ByteField, BooleanField, ListField,
     StreamField, StringStreamField, ByteStreamField
 )
 from captaincloud.task.field import (
@@ -99,6 +99,28 @@ class TestValueFields(unittest.TestCase):
         instance = BooleanField()
         instance.set(True)
         self.assertEqual(instance.get(), True)
+
+    def test_list_field(self):
+        instance = ListField(type=StringField, default=[six.u('XYZ')])
+        self.assertEqual(instance.get(), [six.u('XYZ')])
+
+        instance.append(six.u('ABC'))
+        self.assertEqual(instance.get(), [six.u('XYZ'), six.u('ABC')])
+
+        instance.set([six.u('A'), six.u('B'), six.u('C')])
+        self.assertEqual(instance.get(), [six.u('A'), six.u('B'), six.u('C')])
+
+        self.assertEqual(instance.pop(), six.u('C'))
+        self.assertEqual(instance.pop(0), six.u('A'))
+
+        instance = ListField(type=FloatField)
+        self.assertEqual(instance.get(), [])
+
+        with self.assertRaises(InvalidValueException):
+            instance.append(six.u('ABC'))
+
+        with self.assertRaises(InvalidValueException):
+            instance.set(123)
 
     def test_new_field(self):
         class NewField(ValueField):
