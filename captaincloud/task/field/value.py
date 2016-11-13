@@ -17,14 +17,16 @@ class ValueField(Field):
 class StringField(ValueField):
     """String field class"""
 
-    def __init__(self, default=None):
+    def __init__(self, default=None, nullable=True):
         super(StringField, self).__init__()
-        self._value = None
-        if default is not None:
-            self.set(value=default)
+        self._nullable = nullable
+        self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, six.text_type):
+        if value is None and self._nullable:
+            self._value = value
+            return
+        elif not isinstance(value, six.text_type):
             raise InvalidValueException('Expected a string')
         self._value = value
 
@@ -35,14 +37,16 @@ class StringField(ValueField):
 class ByteField(ValueField):
     """Byte field class"""
 
-    def __init__(self, default=None):
+    def __init__(self, default=None, nullable=True):
         super(ByteField, self).__init__()
-        self._value = None
-        if default is not None:
-            self.set(value=default)
+        self._nullable = nullable
+        self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, six.binary_type):
+        if value is None and self._nullable:
+            self._value = value
+            return
+        elif not isinstance(value, six.binary_type):
             raise InvalidValueException('Expected bytes')
         self._value = value
 
@@ -53,14 +57,16 @@ class ByteField(ValueField):
 class IntegerField(ValueField):
     """Integer field class"""
 
-    def __init__(self, default=None):
+    def __init__(self, default=None, nullable=True):
         super(IntegerField, self).__init__()
-        self._value = None
-        if default is not None:
-            self.set(value=default)
+        self._nullable = nullable
+        self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, int):
+        if value is None and self._nullable:
+            self._value = value
+            return
+        elif not isinstance(value, int):
             raise InvalidValueException('Expected an integer')
         self._value = value
 
@@ -71,14 +77,16 @@ class IntegerField(ValueField):
 class FloatField(ValueField):
     """Float field class"""
 
-    def __init__(self, default=None):
+    def __init__(self, default=None, nullable=True):
         super(FloatField, self).__init__()
-        self._value = None
-        if default is not None:
-            self.set(value=default)
+        self._nullable = nullable
+        self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, float) and not isinstance(value, int):
+        if value is None and self._nullable:
+            self._value = value
+            return
+        elif not isinstance(value, float) and not isinstance(value, int):
             raise InvalidValueException('Expected a float')
         self._value = float(value)
 
@@ -89,14 +97,16 @@ class FloatField(ValueField):
 class BooleanField(ValueField):
     """Boolean field class"""
 
-    def __init__(self, default=None):
+    def __init__(self, default=None, nullable=True):
         super(BooleanField, self).__init__()
-        self._value = None
-        if default is not None:
-            self.set(value=default)
+        self._nullable = nullable
+        self.set(value=default)
 
     def set(self, value):
-        if not isinstance(value, bool):
+        if value is None and self._nullable:
+            self._value = value
+            return
+        elif not isinstance(value, bool):
             raise InvalidValueException('Expected a boolean')
         self._value = value
 
