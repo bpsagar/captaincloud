@@ -8,12 +8,10 @@ class Field(object):
         """Clone a field"""
         return copy.deepcopy(self)
 
-    @classmethod
     def serialize(cls, value):
         """Serialize the input value"""
         return value
 
-    @classmethod
     def deserialize(cls, value):
         """Deserialize the input value"""
         return value

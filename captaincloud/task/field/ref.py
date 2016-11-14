@@ -50,3 +50,15 @@ class ListField(ReferenceField):
         clone = self.__class__(ref_type=self.ref_type)
         clone.set(self.get())
         return clone
+
+    def serialize(self, value):
+        result = []
+        for item in value:
+            result.append(self.ref_type.serialize(item))
+        return result
+
+    def deserialize(self, value):
+        result = []
+        for item in value:
+            result.append(self.ref_type.deserialize(item))
+        return result
