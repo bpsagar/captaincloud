@@ -101,7 +101,7 @@ class TestValueFields(unittest.TestCase):
         self.assertEqual(instance.get(), True)
 
     def test_list_field(self):
-        instance = ListField(type=StringField, default=[six.u('XYZ')])
+        instance = ListField(StringField(), default=[six.u('XYZ')])
         self.assertEqual(instance.get(), [six.u('XYZ')])
 
         instance.append(six.u('ABC'))
@@ -113,7 +113,7 @@ class TestValueFields(unittest.TestCase):
         self.assertEqual(instance.pop(), six.u('C'))
         self.assertEqual(instance.pop(0), six.u('A'))
 
-        instance = ListField(type=FloatField)
+        instance = ListField(FloatField())
         self.assertEqual(instance.get(), [])
 
         with self.assertRaises(InvalidValueException):

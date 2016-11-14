@@ -20,7 +20,7 @@ class TestFields(unittest.TestCase):
                 string = field.StringField(default=six.u('ABCD'))
                 integer = field.IntegerField(default=5)
                 instream = field.StringStreamField()
-                integer_array = field.ListField(type=field.IntegerField)
+                integer_array = field.ListField(field.IntegerField())
 
             class Output:
                 floating = field.FloatField(default=1.5)
@@ -113,7 +113,8 @@ class TestFields(unittest.TestCase):
             'ID': 'random',
             'Input': {
                 'string': six.u('ABCD'),
-                'integer': 5
+                'integer': 5,
+                'integer_array': [1, 2, 3]
             },
             'Output': {
                 'floating': 1.5,

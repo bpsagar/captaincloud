@@ -3,7 +3,9 @@ from .stream import (
     StreamField, StringStreamField, ByteStreamField
 )
 from .value import (
-    ValueField, StringField, ByteField, IntegerField, FloatField, BooleanField,
-    ListField
+    ValueField, StringField, ByteField, IntegerField, FloatField, BooleanField
+)
+from .ref import (
+    ReferenceField, ListField
 )
 from .exc import InvalidValueException, StreamNotAvailableException

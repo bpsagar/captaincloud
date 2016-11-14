@@ -112,34 +112,3 @@ class BooleanField(ValueField):
 
     def get(self):
         return self._value
-
-
-class ListField(ValueField):
-    """List field class"""
-
-    def __init__(self, type, default=None):
-        super(ListField, self).__init__()
-        self._type = type
-        self._value = []
-        if default is not None:
-            self.set(value=default)
-
-    def set(self, value):
-        if not isinstance(value, list):
-            raise InvalidValueException('Expected a list')
-        self._value = []
-        for item in value:
-            self.append(item)
-
-    def get(self):
-        return [item.get() for item in self._value]
-
-    def append(self, item):
-        """Add an item to the list"""
-        item_obj = self._type(default=item)
-        self._value.append(item_obj)
-
-    def pop(self, *args, **kwargs):
-        """Pop a value from the list"""
-        value = self._value.pop(*args, **kwargs)
-        return value.get()
