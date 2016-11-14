@@ -11,14 +11,14 @@ class TestTaskRunner(unittest.TestCase):
     def setUp(self):
         self.task_runner = TaskRunner()
 
-        class AddTaskImpl(TaskImpl):
+        class DivideTaskImpl(TaskImpl):
             def run(self):
-                self.task.Output.ans = self.task.Input.x + self.task.Input.y
+                self.task.Output.ans = self.task.Input.x / self.task.Input.y
 
         @TaskRegistry.register
-        class AddTask(Task):
+        class DivideTask(Task):
             ID = 'add'
-            impl = AddTaskImpl
+            impl = DivideTaskImpl
 
             class Input:
                 x = field.FloatField()
@@ -27,7 +27,8 @@ class TestTaskRunner(unittest.TestCase):
             class Output:
                 ans = field.FloatField()
 
-        self.task = AddTask(x=10, y=20)
+        self.task = DivideTask(x=20, y=2)
+        self.error_task = DivideTask(x=20, y=0)
 
     def test_add_task(self):
         self.assertTrue(self.task_runner.is_empty())
@@ -48,12 +49,20 @@ class TestTaskRunner(unittest.TestCase):
 
     def test_task_runner(self):
         self.task_runner.start()
-        self.task_runner.add(self.task)
+        time.sleep(2)
         self.assertTrue(self.task_runner._is_running)
+        self.task_runner.add(self.task)
+        self.task_runner.add(self.error_task)
+        self.assertTrue(self.task_runner._is_running)
+        self.task_runner.stop()
+
         while not self.task_runner.is_empty():
             time.sleep(1)
-        self.task_runner.stop()
+
         self.assertFalse(self.task_runner._is_running)
         self.assertEqual(
             self.task_runner.get_status(task=self.task), TaskRunner.COMPLETED)
         self.assertTrue(self.task.Output.ans, 30)
+
+        self.assertEqual(self.task_runner.get_status(
+            task=self.error_task), TaskRunner.ERROR)

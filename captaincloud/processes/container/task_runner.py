@@ -8,6 +8,7 @@ class TaskRunner(threading.Thread):
     WAITING = 'WAITING'
     RUNNING = 'RUNNING'
     COMPLETED = 'COMPLETED'
+    ERROR = 'ERROR'
 
     def __init__(self, *args, **kwargs):
         super(TaskRunner, self).__init__(*args, **kwargs)
@@ -47,5 +48,9 @@ class TaskRunner(threading.Thread):
             except queue.Empty:
                 continue
             self.set_status(task=task, status=TaskRunner.RUNNING)
-            task.run()
+            try:
+                task.run()
+            except Exception as e:
+                self.set_status(task=task, status=TaskRunner.ERROR)
+                continue
             self.set_status(task=task, status=TaskRunner.COMPLETED)
