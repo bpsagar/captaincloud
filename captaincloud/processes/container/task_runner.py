@@ -1,3 +1,4 @@
+import logging
 import threading
 import uuid
 from six.moves import queue
@@ -39,6 +40,10 @@ class TaskRunner(threading.Thread):
         """Set status of the task"""
         task.STATUS = status
 
+    def get_logger(self, task):
+        """Returns a logger for task"""
+        return logging.getLogger(task.RUN_ID)
+
     def run(self):
         """Task runner thread watches the queue and executes all the tasks
         added to the queue"""
@@ -49,7 +54,7 @@ class TaskRunner(threading.Thread):
                 continue
             self.set_status(task=task, status=TaskRunner.RUNNING)
             try:
-                task.run()
+                task.run(logger=self.get_logger(task=task))
             except Exception as e:
                 self.set_status(task=task, status=TaskRunner.ERROR)
                 continue

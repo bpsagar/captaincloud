@@ -45,8 +45,8 @@ class Task(object):
                 setattr(FieldSet, field, field_type.deserialize(value))
         return instance
 
-    def run(self):
+    def run(self, logger=None):
         """Execute the task. Instantiate a TaskImpl instance and pass self
         to give access to input and output fields"""
-        task_impl = self.impl(task=self)
+        task_impl = self.impl(task=self, logger=logger)
         task_impl.run()
