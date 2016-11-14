@@ -24,6 +24,7 @@ class TestFields(unittest.TestCase):
 
             class Output:
                 floating = field.FloatField(default=1.5)
+                none = field.IntegerField()
                 outstream = field.ByteStreamField()
 
         self.RandomTask = RandomTask
@@ -82,7 +83,8 @@ class TestFields(unittest.TestCase):
                 'integer_array': []
             },
             'Output': {
-                'floating': 1.5
+                'floating': 1.5,
+                'none': None
             }
         }
         self.assertEqual(task.serialize(), serialized)
@@ -100,7 +102,8 @@ class TestFields(unittest.TestCase):
                 'integer_array': [1, 2, 3]
             },
             'Output': {
-                'floating': 2.5
+                'floating': 2.5,
+                'none': None
             }
         }
         self.assertEqual(task.serialize(), serialized)
@@ -113,7 +116,8 @@ class TestFields(unittest.TestCase):
                 'integer': 5
             },
             'Output': {
-                'floating': 1.5
+                'floating': 1.5,
+                'none': None
             }
         }
         instance = Task.deserialize(data=serialized)
@@ -129,7 +133,8 @@ class TestFields(unittest.TestCase):
                 'integer': 10
             },
             'Output': {
-                'floating': 2.5
+                'floating': 2.5,
+                'none': None
             }
         }
         instance = Task.deserialize(data=serialized)
