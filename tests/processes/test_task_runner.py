@@ -1,5 +1,4 @@
 import unittest
-import time
 from captaincloud.processes.container import TaskRunner
 from captaincloud.task import Task, TaskImpl, field
 from captaincloud.task.registry import TaskRegistry
@@ -49,15 +48,12 @@ class TestTaskRunner(unittest.TestCase):
 
     def test_task_runner(self):
         self.task_runner.start()
-        time.sleep(2)
         self.assertTrue(self.task_runner._is_running)
         self.task_runner.add(self.task)
         self.task_runner.add(self.error_task)
         self.assertTrue(self.task_runner._is_running)
         self.task_runner.stop()
-
-        while not self.task_runner.is_empty():
-            time.sleep(1)
+        self.task_runner.join()
 
         self.assertFalse(self.task_runner._is_running)
         self.assertEqual(

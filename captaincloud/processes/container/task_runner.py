@@ -18,6 +18,7 @@ class TaskRunner(threading.Thread):
     def stop(self):
         """Stop the task runner"""
         self._is_running = False
+        self._queue.put(None)
 
     def is_empty(self):
         """Check if the queue is empty"""
@@ -43,9 +44,8 @@ class TaskRunner(threading.Thread):
         added to the queue"""
         self._is_running = True
         while self._is_running or not self.is_empty():
-            try:
-                task = self._queue.get(block=True, timeout=1)
-            except queue.Empty:
+            task = self._queue.get()
+            if task is None:
                 continue
             self.set_status(task=task, status=TaskRunner.RUNNING)
             try:
