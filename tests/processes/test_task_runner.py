@@ -37,7 +37,6 @@ class TestTaskRunner(unittest.TestCase):
         self.assertEqual(
             self.task_runner.get_status(task=self.task),
             TaskRunner.WAITING)
-        self.assertEqual(self.task_runner.get_queue(), [self.task])
         self.assertFalse(self.task_runner.is_empty())
         self.task_runner.stop()
 
