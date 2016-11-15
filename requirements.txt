@@ -1,3 +1,5 @@
 six==1.10.0
+bottle==0.12.10
 pytest==3.0.3
 pytest-cov==2.4.0
+WebTest==2.0.23

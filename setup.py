@@ -9,13 +9,15 @@ setup(
     license='MIT',
     packages=find_packages(exclude=('tests',)),
     install_requires=[
-        'six'
+        'six',
+        'bottle'
     ],
     setup_requires=[
         'pytest-runner'
     ],
     tests_require=[
         'pytest',
-        'pytest-cov'
+        'pytest-cov',
+        'WebTest'
     ],
     zip_safe=False)
