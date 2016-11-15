@@ -35,30 +35,30 @@ class TestTaskRunner(unittest.TestCase):
         self.assertTrue(hasattr(self.task, 'RUN_ID'))
         self.assertEqual(self.task.RUN_ID, run_id)
         self.assertEqual(
-            self.task_runner.get_status(task=self.task),
+            self.task_runner.get_status(run_id=run_id),
             TaskRunner.WAITING)
         self.assertFalse(self.task_runner.is_empty())
         self.task_runner.stop()
 
     def test_task_status(self):
-        self.task_runner.add(self.task)
-        self.task_runner.set_status(task=self.task, status=TaskRunner.RUNNING)
+        run_id = self.task_runner.add(self.task)
+        self.task_runner.set_status(run_id=run_id, status=TaskRunner.RUNNING)
         self.assertEqual(
-            self.task_runner.get_status(task=self.task), TaskRunner.RUNNING)
+            self.task_runner.get_status(run_id=run_id), TaskRunner.RUNNING)
 
     def test_task_runner(self):
         self.task_runner.start()
         self.assertTrue(self.task_runner._is_running)
-        self.task_runner.add(self.task)
-        self.task_runner.add(self.error_task)
+        run_id1 = self.task_runner.add(self.task)
+        run_id2 = self.task_runner.add(self.error_task)
         self.assertTrue(self.task_runner._is_running)
         self.task_runner.stop()
         self.task_runner.join()
 
         self.assertFalse(self.task_runner._is_running)
         self.assertEqual(
-            self.task_runner.get_status(task=self.task), TaskRunner.COMPLETED)
+            self.task_runner.get_status(run_id=run_id1), TaskRunner.COMPLETED)
         self.assertTrue(self.task.Output.ans, 30)
 
         self.assertEqual(self.task_runner.get_status(
-            task=self.error_task), TaskRunner.ERROR)
+            run_id=run_id2), TaskRunner.ERROR)
