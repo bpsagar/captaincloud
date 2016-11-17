@@ -2,8 +2,8 @@ import six
 import unittest
 
 from captaincloud.task.field import (
-    FloatField, IntegerField, StringField, ByteField, BooleanField, ListField,
-    StreamField, StringStreamField, ByteStreamField
+    FloatField, IntegerField, StringField, ByteField, BooleanField, AnyField,
+    ListField, StreamField, StringStreamField, ByteStreamField
 )
 from captaincloud.task.field import (
     ValueField, InvalidValueException, StreamNotAvailableException
@@ -97,6 +97,11 @@ class TestValueFields(unittest.TestCase):
             instance.set('True')
 
         instance = BooleanField()
+        instance.set(True)
+        self.assertEqual(instance.get(), True)
+
+    def test_any_field(self):
+        instance = AnyField(default='hello')
         instance.set(True)
         self.assertEqual(instance.get(), True)
 

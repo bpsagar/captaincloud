@@ -1,3 +1,4 @@
+import pickle
 import six
 import unittest
 
@@ -21,6 +22,7 @@ class TestFields(unittest.TestCase):
                 integer = field.IntegerField(default=5)
                 instream = field.StringStreamField()
                 integer_array = field.ListField(field.IntegerField())
+                anyf = field.AnyField(default={1: 2})
 
             class Output:
                 floating = field.FloatField(default=1.5)
@@ -80,7 +82,8 @@ class TestFields(unittest.TestCase):
             'Input': {
                 'string': six.u('ABCD'),
                 'integer': 5,
-                'integer_array': []
+                'integer_array': [],
+                'anyf': pickle.dumps({1: 2})
             },
             'Output': {
                 'floating': 1.5,
@@ -93,13 +96,15 @@ class TestFields(unittest.TestCase):
         task.Input.string = six.u('XYZ')
         task.Input.integer = 10
         task.Input.integer_array = [1, 2, 3]
+        task.Input.anyf = ['hello', 'world']
         task.Output.floating = 2.5
         serialized = {
             'ID': 'random',
             'Input': {
                 'string': six.u('XYZ'),
                 'integer': 10,
-                'integer_array': [1, 2, 3]
+                'integer_array': [1, 2, 3],
+                'anyf': pickle.dumps(['hello', 'world'])
             },
             'Output': {
                 'floating': 2.5,
@@ -114,7 +119,8 @@ class TestFields(unittest.TestCase):
             'Input': {
                 'string': six.u('ABCD'),
                 'integer': 5,
-                'integer_array': [1, 2, 3]
+                'integer_array': [1, 2, 3],
+                'anyf': pickle.dumps(100)
             },
             'Output': {
                 'floating': 1.5,

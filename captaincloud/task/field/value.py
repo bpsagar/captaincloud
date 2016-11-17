@@ -1,6 +1,7 @@
 from .base import Field
 from .exc import InvalidValueException
 
+import pickle
 import six
 
 
@@ -112,3 +113,23 @@ class BooleanField(ValueField):
 
     def get(self):
         return self._value
+
+
+class AnyField(ValueField):
+    """Field class for any python type"""
+
+    def __init__(self, default=None):
+        super(AnyField, self).__init__()
+        self.set(value=default)
+
+    def set(self, value):
+        self._value = value
+
+    def get(self):
+        return self._value
+
+    def serialize(self, value):
+        return pickle.dumps(value)
+
+    def deserialize(self, value):
+        return pickle.loads(value)
