@@ -1,9 +1,22 @@
 from .base import Field
-from .exc import InvalidValueException
 
 
 class ReferenceField(Field):
-    pass
+    @classmethod
+    def make_property(cls, name):
+        def _set(self, value):
+            field = self.__fields__.get(name)
+            self._field_values[name] = field.set(value)
+
+        def _get(self):
+            field = self.__fields__.get(name)
+            return field.get(self._field_values[name])
+
+        return property(fget=_get, fset=_set)
+
+    @classmethod
+    def is_serializable(cls):
+        return True
 
 
 class ListValue(list):
@@ -20,6 +33,9 @@ class ListField(ReferenceField):
         super(ListField, self).__init__()
         self.ref_type = ref_type
         self.default = default
+
+    def get_initial(self):
+        return self.create()
 
     def get(self, value):
         return value
@@ -47,7 +63,3 @@ class ListField(ReferenceField):
         for item in value:
             result.append(self.ref_type.deserialize(item))
         return result
-
-
-class ComplexField(ReferenceField):
-    pass

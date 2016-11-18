@@ -39,13 +39,8 @@ class Task(object):
         instance = TaskRegistry.get(id=data['ID'])()
         for fieldset in TaskMeta.FIELDSETS:
             fields = data[fieldset]
-            FieldSet = getattr(instance, fieldset)
-            for field, value in fields.items():
-                if field in FieldSet.__value_fields__:
-                    field_type = FieldSet.__value_fields__.get(field)
-                elif field in FieldSet.__ref_fields__:
-                    field_type = FieldSet.__ref_fields__.get(field)
-                setattr(FieldSet, field, field_type.deserialize(value))
+            fieldset_obj = getattr(instance, fieldset)
+            fieldset_obj.deserialize(fields)
         return instance
 
     def run(self, logger=None):

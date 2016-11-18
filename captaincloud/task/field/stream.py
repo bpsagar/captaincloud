@@ -38,6 +38,22 @@ class StreamField(Field):
     def create(self):
         raise NotImplementedError
 
+    def get_initial(self):
+        return self.create()
+
+    @classmethod
+    def is_serializable(cls):
+        return False
+
+    @classmethod
+    def make_property(cls, name):
+        """Returns a property function for a field"""
+
+        def _get(self):
+            return self._field_values[name]
+
+        return property(fget=_get)
+
 
 class StringStreamField(StreamField):
     def create(self):

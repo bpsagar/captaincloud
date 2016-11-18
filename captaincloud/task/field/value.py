@@ -17,6 +17,24 @@ class ValueField(Field):
     def get_initial(self):
         raise NotImplementedError
 
+    @classmethod
+    def is_serializable(cls):
+        return True
+
+    @classmethod
+    def make_property(cls, name):
+        def _set(self, value):
+            field = self.__fields__.get(name)
+            value = field.set(value)
+            self._field_values[name] = value
+
+        def _get(self):
+            field = self.__fields__.get(name)
+            value = self._field_values[name]
+            return field.get(value)
+
+        return property(fget=_get, fset=_set)
+
 
 class StringField(ValueField):
     """String field class"""

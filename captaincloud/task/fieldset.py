@@ -6,83 +6,35 @@ class FieldSet(object):
 
     def __init__(self, *args, **kwargs):
         super(FieldSet, self).__init__(*args, **kwargs)
-        self._value_fields = {}
-        self._stream_fields = {}
-        self._ref_fields = {}
-        for name, field in self.__value_fields__.items():
-            self._value_fields[name] = field.get_initial()
-        for name, field in self.__stream_fields__.items():
-            self._stream_fields[name] = field.create()
-        for name, field in self.__ref_fields__.items():
-            self._ref_fields[name] = field.create()
-
-    @staticmethod
-    def make_value_field_property(field_name):
-        """Returns a property function for a field"""
-
-        def _set(self, value):
-            field = self.__value_fields__.get(field_name)
-            value = field.set(value)
-            self._value_fields[field_name] = value
-
-        def _get(self):
-            field = self.__value_fields__.get(field_name)
-            value = self._value_fields[field_name]
-            return field.get(value)
-
-        return property(fget=_get, fset=_set)
-
-    @staticmethod
-    def make_stream_field_property(field_name):
-        """Returns a property function for a field"""
-
-        def _get(self):
-            return self._stream_fields[field_name]
-
-        return property(fget=_get)
-
-    @staticmethod
-    def make_ref_field_property(field_name):
-        def _set(self, value):
-            field = self.__ref_fields__.get(field_name)
-            self._ref_fields[field_name] = field.set(value)
-
-        def _get(self):
-            field = self.__ref_fields__.get(field_name)
-            return field.get(self._ref_fields[field_name])
-
-        return property(fget=_get, fset=_set)
+        self._field_values = {}
+        for name, field in self.__fields__.items():
+            self._field_values[name] = field.get_initial()
 
     @classmethod
     def create_class(cls, fieldset_class):
         """Create a fieldset class"""
         new_dct = dict(cls.__dict__)
-        new_dct['__value_fields__'] = {}
-        new_dct['__stream_fields__'] = {}
-        new_dct['__ref_fields__'] = {}
+        new_dct['__fields__'] = {}
 
         for attr in dir(fieldset_class):
             field = getattr(fieldset_class, attr)
             if not isinstance(field, Field):
                 continue
-            if isinstance(field, ValueField):
-                new_dct['__value_fields__'][attr] = field
-                new_dct[attr] = cls.make_value_field_property(field_name=attr)
-            elif isinstance(field, StreamField):
-                new_dct['__stream_fields__'][attr] = field
-                new_dct[attr] = cls.make_stream_field_property(field_name=attr)
-            elif isinstance(field, ReferenceField):
-                new_dct['__ref_fields__'][attr] = field
-                new_dct[attr] = cls.make_ref_field_property(field_name=attr)
+            new_dct['__fields__'][attr] = field
+            new_dct[attr] = field.make_property(attr)
         return type('FieldSetClass', (cls,), new_dct)
 
     def serialize(self):
         """Serialize fieldset"""
         data = {}
-        for field in self._value_fields:
-            field_type = self.__value_fields__.get(field)
-            data[field] = field_type.serialize(getattr(self, field))
-        for field in self._ref_fields:
-            field_type = self.__ref_fields__.get(field)
-            data[field] = field_type.serialize(getattr(self, field))
+        for field in self._field_values:
+            field_type = self.__fields__[field]
+            if field_type.is_serializable():
+                data[field] = field_type.serialize(getattr(self, field))
         return data
+
+    def deserialize(self, data):
+        for field, value in data.items():
+            if field in self.__fields__:
+                field_type = self.__fields__.get(field)
+            setattr(self, field, field_type.deserialize(value))
