@@ -4,5 +4,5 @@ class InvalidValueException(Exception):
 
 
 class StreamNotAvailableException(Exception):
-    """Exceotion raised when real stream is unavailable"""
+    """Exception raised when real stream is unavailable"""
     pass
