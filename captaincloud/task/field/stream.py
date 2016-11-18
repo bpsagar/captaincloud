@@ -4,8 +4,9 @@ from .exc import InvalidValueException, StreamNotAvailableException
 import six
 
 
-class StreamField(Field):
-    def __init__(self):
+class Stream(object):
+    def __init__(self, stream_type):
+        self.stream_type = stream_type
         self.real_stream = None
 
     def set_real_stream(self, real_stream):
@@ -22,23 +23,27 @@ class StreamField(Field):
         self.validate(data)
         return self.real_stream.write(self.serialize(data))
 
+    def validate(self, data):
+        if not isinstance(data, self.stream_type):
+            raise InvalidValueException()
+
     def serialize(self, data):
         return data
 
     def deserialize(self, data):
         return data
 
-    def validate(self, data):
+
+class StreamField(Field):
+    def create(self):
         raise NotImplementedError
 
 
 class StringStreamField(StreamField):
-    def validate(self, data):
-        if not isinstance(data, six.text_type):
-            raise InvalidValueException('Expected string data')
+    def create(self):
+        return Stream(stream_type=six.text_type)
 
 
 class ByteStreamField(StreamField):
-    def validate(self, data):
-        if not isinstance(data, six.binary_type):
-            raise InvalidValueException('Expected bytes data')
+    def create(self):
+        return Stream(stream_type=six.binary_type)

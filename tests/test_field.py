@@ -15,32 +15,22 @@ class TestValueFields(unittest.TestCase):
 
     def test_float_field(self):
         instance = FloatField()
-        self.assertEqual(instance.get(), None)
+        self.assertEqual(instance.get_initial(), None)
 
-        instance.set(1)
-        self.assertEqual(instance.get(), 1)
-
-        instance.set(1.5)
-        self.assertEqual(instance.get(), 1.5)
+        self.assertEqual(instance.get(instance.set(1)), 1)
+        self.assertEqual(instance.get(instance.set(1.5)), 1.5)
 
         with self.assertRaises(InvalidValueException):
             instance.set('ABC')
 
         instance = FloatField(default=2.5)
-        self.assertEqual(instance.get(), 2.5)
-
-        instance1 = FloatField(default=2.5)
-        instance2 = instance1.clone()
-        self.assertEqual(instance1.get(), instance2.get())
-        instance1.set(4.0)
-        self.assertNotEqual(instance1.get(), instance2.get())
+        self.assertEqual(instance.get_initial(), 2.5)
 
     def test_integer_field(self):
         instance = IntegerField()
-        self.assertEqual(instance.get(), None)
+        self.assertEqual(instance.get_initial(), None)
 
-        instance.set(1)
-        self.assertEqual(instance.get(), 1)
+        self.assertEqual(instance.get(instance.set(1)), 1)
 
         with self.assertRaises(InvalidValueException):
             instance.set(1.5)
@@ -49,14 +39,13 @@ class TestValueFields(unittest.TestCase):
             instance.set('ABC')
 
         instance = IntegerField(default=2)
-        self.assertEqual(instance.get(), 2)
+        self.assertEqual(instance.get_initial(), 2)
 
     def test_string_field(self):
         instance = StringField()
-        self.assertEqual(instance.get(), None)
+        self.assertEqual(instance.get_initial(), None)
 
-        instance.set(six.u('ABC'))
-        self.assertEqual(instance.get(), six.u('ABC'))
+        self.assertEqual(instance.get(instance.set(six.u('ABC'))), six.u('ABC'))
 
         with self.assertRaises(InvalidValueException):
             instance.set(1)
@@ -68,14 +57,13 @@ class TestValueFields(unittest.TestCase):
             instance.set(six.b('ABC'))
 
         instance = StringField(default=six.u('ABC'))
-        self.assertEqual(instance.get(), six.u('ABC'))
+        self.assertEqual(instance.get_initial(), six.u('ABC'))
 
     def test_byte_field(self):
         instance = ByteField()
-        self.assertEqual(instance.get(), None)
+        self.assertEqual(instance.get_initial(), None)
 
-        instance.set(six.b('ABC'))
-        self.assertEqual(instance.get(), six.b('ABC'))
+        self.assertEqual(instance.get(instance.set(six.b('ABC'))), six.b('ABC'))
 
         with self.assertRaises(InvalidValueException):
             instance.set(1)
@@ -87,45 +75,22 @@ class TestValueFields(unittest.TestCase):
             instance.set(six.u('ABC'))
 
         instance = ByteField(default=six.b('ABC'))
-        self.assertEqual(instance.get(), six.b('ABC'))
+        self.assertEqual(instance.get_initial(), six.b('ABC'))
 
     def test_boolean_field(self):
         instance = BooleanField(default=False)
-        self.assertEqual(instance.get(), False)
+        self.assertEqual(instance.get_initial(), False)
 
         with self.assertRaises(InvalidValueException):
             instance.set('True')
 
         instance = BooleanField()
-        instance.set(True)
-        self.assertEqual(instance.get(), True)
+        self.assertEqual(instance.get(instance.set(True)), True)
 
     def test_any_field(self):
         instance = AnyField(default='hello')
-        instance.set(True)
-        self.assertEqual(instance.get(), True)
-
-    def test_list_field(self):
-        instance = ListField(StringField(), default=[six.u('XYZ')])
-        self.assertEqual(instance.get(), [six.u('XYZ')])
-
-        instance.append(six.u('ABC'))
-        self.assertEqual(instance.get(), [six.u('XYZ'), six.u('ABC')])
-
-        instance.set([six.u('A'), six.u('B'), six.u('C')])
-        self.assertEqual(instance.get(), [six.u('A'), six.u('B'), six.u('C')])
-
-        self.assertEqual(instance.pop(), six.u('C'))
-        self.assertEqual(instance.pop(0), six.u('A'))
-
-        instance = ListField(FloatField())
-        self.assertEqual(instance.get(), [])
-
-        with self.assertRaises(InvalidValueException):
-            instance.append(six.u('ABC'))
-
-        with self.assertRaises(InvalidValueException):
-            instance.set(123)
+        self.assertEqual(instance.get_initial(), 'hello')
+        self.assertEqual(instance.get(instance.set(True)), True)
 
     def test_new_field(self):
         class NewField(ValueField):
@@ -137,14 +102,18 @@ class TestValueFields(unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             instance = NewField()
-            instance.get()
+            instance.get(100)
+
+        with self.assertRaises(NotImplementedError):
+            instance = NewField()
+            instance.get_initial()
 
 
 class TestStreamFields(unittest.TestCase):
     """Tests for stream fields"""
 
     def test_string_stream(self):
-        instance = StringStreamField()
+        instance = StringStreamField().create()
         with self.assertRaises(StreamNotAvailableException):
             instance.write(six.u('hello'))
 
@@ -173,7 +142,7 @@ class TestStreamFields(unittest.TestCase):
         self.assertEqual(instance.read(), six.u('hello'))
 
     def test_byte_stream(self):
-        instance = ByteStreamField()
+        instance = ByteStreamField().create()
         with self.assertRaises(StreamNotAvailableException):
             instance.write(six.u('hello'))
 
@@ -201,15 +170,24 @@ class TestStreamFields(unittest.TestCase):
         instance.write(six.b('hello'))
         self.assertEqual(instance.read(), six.b('hello'))
 
-    def test_force_stream_validate(self):
-        class MyStreamField(StreamField):
-            pass
 
-        class DummyStream(object):
-            pass
+class TestRefFields(unittest.TestCase):
+    def test_list_field(self):
+        instance = ListField(StringField(), default=[six.u('XYZ')])
+        self.assertEqual(instance.create(), [six.u('XYZ')])
 
-        instance = MyStreamField()
-        instance.set_real_stream(DummyStream())
+        val = instance.create()
+        val.append(six.u('ABC'))
+        self.assertEqual(val, [six.u('XYZ'), six.u('ABC')])
 
-        with self.assertRaises(NotImplementedError):
-            instance.write(six.u('hello'))
+        val = instance.set([six.u('A'), six.u('B'), six.u('C')])
+        self.assertEqual(val, [six.u('A'), six.u('B'), six.u('C')])
+
+        self.assertEqual(val.pop(), six.u('C'))
+        self.assertEqual(val.pop(0), six.u('A'))
+
+        instance = ListField(FloatField())
+        self.assertEqual(instance.create(), [])
+
+        with self.assertRaises(InvalidValueException):
+            instance.create().append(six.u('ABC'))

@@ -12,44 +12,29 @@ class ListValue(list):
         self.ref_type = ref_type
 
     def append(self, item):
-        self.ref_type.set(item)
-        super(ListValue, self).append(self.ref_type.get())
+        super(ListValue, self).append(self.ref_type.set(item))
 
 
 class ListField(ReferenceField):
     def __init__(self, ref_type, default=[]):
         super(ListField, self).__init__()
         self.ref_type = ref_type
-        self.items = ListValue(ref_type=ref_type)
+        self.default = default
 
-        for item in default:
-            self.append(item)
-
-    def get(self):
-        return self.items
+    def get(self, value):
+        return value
 
     def set(self, value):
-        try:
-            iterable = iter(value)
-        except TypeError:
-            raise InvalidValueException('Expected iterable')
-        self.clear()
-        for item in iterable:
-            self.append(item)
+        val = ListValue(ref_type=self.ref_type)
+        for item in value:
+            val.append(item)
+        return val
 
-    def clear(self):
-        self.items = ListValue(ref_type=self.ref_type)
-
-    def append(self, item):
-        self.items.append(item)
-
-    def pop(self, pos=-1):
-        return self.items.pop(pos)
-
-    def clone(self):
-        clone = self.__class__(ref_type=self.ref_type)
-        clone.set(self.get())
-        return clone
+    def create(self):
+        val = ListValue(ref_type=self.ref_type)
+        for item in self.default:
+            val.append(item)
+        return val
 
     def serialize(self, value):
         result = []
@@ -62,3 +47,7 @@ class ListField(ReferenceField):
         for item in value:
             result.append(self.ref_type.deserialize(item))
         return result
+
+
+class ComplexField(ReferenceField):
+    pass

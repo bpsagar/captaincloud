@@ -10,21 +10,25 @@ class FieldSet(object):
         self._stream_fields = {}
         self._ref_fields = {}
         for name, field in self.__value_fields__.items():
-            self._value_fields[name] = field.clone()
+            self._value_fields[name] = field.get_initial()
         for name, field in self.__stream_fields__.items():
-            self._stream_fields[name] = field.clone()
+            self._stream_fields[name] = field.create()
         for name, field in self.__ref_fields__.items():
-            self._ref_fields[name] = field.clone()
+            self._ref_fields[name] = field.create()
 
     @staticmethod
     def make_value_field_property(field_name):
         """Returns a property function for a field"""
 
         def _set(self, value):
-            self._value_fields[field_name].set(value)
+            field = self.__value_fields__.get(field_name)
+            value = field.set(value)
+            self._value_fields[field_name] = value
 
         def _get(self):
-            return self._value_fields[field_name].get()
+            field = self.__value_fields__.get(field_name)
+            value = self._value_fields[field_name]
+            return field.get(value)
 
         return property(fget=_get, fset=_set)
 
@@ -40,10 +44,12 @@ class FieldSet(object):
     @staticmethod
     def make_ref_field_property(field_name):
         def _set(self, value):
-            self._ref_fields[field_name].set(value)
+            field = self.__ref_fields__.get(field_name)
+            self._ref_fields[field_name] = field.set(value)
 
         def _get(self):
-            return self._ref_fields[field_name].get()
+            field = self.__ref_fields__.get(field_name)
+            return field.get(self._ref_fields[field_name])
 
         return property(fget=_get, fset=_set)
 
