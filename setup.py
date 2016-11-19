@@ -18,6 +18,7 @@ setup(
     tests_require=[
         'pytest',
         'pytest-cov',
-        'WebTest'
+        'WebTest',
+        'requests',
     ],
     zip_safe=False)
