@@ -19,3 +19,9 @@ class TaskRegistry(object):
     def get(cls, id):
         """Returns a specific task class by id"""
         return cls.TASKS.get(id)
+
+    @classmethod
+    def create(cls, id, **kwargs):
+        """Returns instance of task specified by id"""
+        klass = cls.get(id)
+        return klass(**kwargs)
