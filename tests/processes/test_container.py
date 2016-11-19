@@ -1,6 +1,6 @@
 import json
 import requests
-import threading
+import multiprocessing
 import unittest
 from captaincloud.processes.container import Container
 from captaincloud.task import Task, TaskImpl, field
@@ -33,8 +33,8 @@ class TestContainer(unittest.TestCase):
         self.AddTask = AddTask
 
     def test_container(self):
-        self.thread = threading.Thread(target=self.container.run)
-        self.thread.start()
+        process = multiprocessing.Process(target=self.container.run)
+        process.start()
 
         task = self.AddTask(x=10, y=20)
         response = requests.post(
@@ -54,4 +54,4 @@ class TestContainer(unittest.TestCase):
             'http://localhost:10000/api/stop/', {'data': json.dumps({})})
         self.assertEqual(response.json().get('data', {}), {})
 
-        self.thread.join()
+        process.join()

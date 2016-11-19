@@ -78,13 +78,13 @@ class TestBottleUtils(unittest.TestCase):
         test = self.Test2(value=10)
         app = bottle_utils.make_app(instance=test, mount='/api')
         process = Process(
-            target=app.run, kwargs={'host': 'localhost', 'port': 10000})
+            target=app.run, kwargs={'host': 'localhost', 'port': 10001})
         process.start()
 
         time.sleep(1)  # Wait for the app to run
 
         client = bottle_utils.make_client(
-            instance=test, base_url='http://localhost:10000/api')
+            instance=test, base_url='http://localhost:10001/api')
         data = client.endpoint(arg1='test')
         expected_data = {'works': True, 'arg1': 'test', 'value': 10}
         self.assertEqual(data, expected_data)
