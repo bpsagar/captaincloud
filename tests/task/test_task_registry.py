@@ -11,7 +11,7 @@ class TestTaskRegistry(unittest.TestCase):
         @TaskRegistry.register
         class DummyTask(object):
             ID = 'dummy'
-            pass
 
         self.assertIn(DummyTask, TaskRegistry.all())
         self.assertEqual(TaskRegistry.get(id='dummy'), DummyTask)
+        self.assertIsInstance(TaskRegistry.create(id='dummy'), DummyTask)

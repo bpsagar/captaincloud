@@ -170,6 +170,9 @@ class TestStreamFields(unittest.TestCase):
         instance.write(six.b('hello'))
         self.assertEqual(instance.read(), six.b('hello'))
 
+        with self.assertRaises(NotImplementedError):
+            StreamField().create()  # Test for coverage :)
+
 
 class TestRefFields(unittest.TestCase):
     def test_list_field(self):
