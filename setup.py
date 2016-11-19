@@ -10,7 +10,8 @@ setup(
     packages=find_packages(exclude=('tests',)),
     install_requires=[
         'six',
-        'bottle'
+        'bottle',
+        'requests',
     ],
     setup_requires=[
         'pytest-runner'
@@ -19,6 +20,5 @@ setup(
         'pytest',
         'pytest-cov',
         'WebTest',
-        'requests',
     ],
     zip_safe=False)
