@@ -39,13 +39,16 @@ class TestBottleUtils(unittest.TestCase):
     def test_make_app(self):
 
         class Test:
+            def __init__(self, value):
+                self.value = value
+
             @bottle_utils.register_api
             def endpoint(self, arg1):
                 if arg1 == 'error':
                     raise Exception('Dummy exception')
-                return {'works': True, 'arg1': arg1}
+                return {'works': True, 'arg1': arg1, 'value': self.value}
 
-        test = Test()
+        test = Test(value=10)
         app = bottle_utils.make_app(instance=test, mount='/api')
         test_app = TestApp(app)
 
@@ -53,7 +56,7 @@ class TestBottleUtils(unittest.TestCase):
         response = test_app.post(
             '/api/endpoint/', {'data': json.dumps(params)})
         expected_response = {
-            'data': {'works': True, 'arg1': 'test'},
+            'data': {'works': True, 'arg1': 'test', 'value': 10},
             'status': 'OK'
         }
         self.assertEqual(response.json, expected_response)
