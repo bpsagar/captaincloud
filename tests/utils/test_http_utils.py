@@ -3,7 +3,9 @@ import time
 import unittest
 from multiprocessing import Process
 from webtest import TestApp
-from captaincloud.utils import bottle_utils
+from captaincloud.utils.http import api
+from captaincloud.utils.http import bottle_api
+from captaincloud.utils.http import client
 
 
 class TestBottleUtils(unittest.TestCase):
@@ -11,11 +13,11 @@ class TestBottleUtils(unittest.TestCase):
 
     def setUp(self):
         class Test1:
-            @bottle_utils.register_api
+            @api.register
             def endpoint1(self):
                 pass
 
-            @bottle_utils.register_api
+            @api.register
             def endpoint2(self):
                 pass
 
@@ -23,7 +25,7 @@ class TestBottleUtils(unittest.TestCase):
             def __init__(self, value):
                 self.value = value
 
-            @bottle_utils.register_api
+            @api.register
             def endpoint(self, arg1):
                 if arg1 == 'error':
                     raise Exception('Dummy exception')
@@ -34,17 +36,17 @@ class TestBottleUtils(unittest.TestCase):
 
     def test_register_api(self):
 
-        @bottle_utils.register_api
+        @api.register
         def dummy():
             pass
 
-        self.assertTrue(hasattr(dummy, bottle_utils.IS_API_ATTR))
-        self.assertTrue(getattr(dummy, bottle_utils.IS_API_ATTR))
+        self.assertTrue(hasattr(dummy, api.IS_API_ATTR))
+        self.assertTrue(getattr(dummy, api.IS_API_ATTR))
         dummy()  # For 100% coverage :D
 
     def test_get_api_methods(self):
         test = self.Test1()
-        methods = bottle_utils.get_api_methods(instance=test)
+        methods = api.get_methods(instance=test)
         self.assertEqual(methods, ['endpoint1', 'endpoint2'])
 
         # For 100% coverage :D
@@ -53,7 +55,7 @@ class TestBottleUtils(unittest.TestCase):
 
     def test_make_app(self):
         test = self.Test2(value=10)
-        app = bottle_utils.make_app(instance=test, mount='/api')
+        app = bottle_api.make_app(instance=test, mount='/api')
         test_app = TestApp(app)
 
         params = {'arg1': 'test'}
@@ -76,21 +78,21 @@ class TestBottleUtils(unittest.TestCase):
 
     def test_make_client(self):
         test = self.Test2(value=10)
-        app = bottle_utils.make_app(instance=test, mount='/api')
+        app = bottle_api.make_app(instance=test, mount='/api')
         process = Process(
             target=app.run, kwargs={'host': 'localhost', 'port': 10001})
         process.start()
 
         time.sleep(1)  # Wait for the app to run
 
-        client = bottle_utils.make_client(
+        c = client.make_client(
             instance=test, base_url='http://localhost:10001/api')
-        data = client.endpoint(arg1='test')
+        data = c.endpoint(arg1='test')
         expected_data = {'works': True, 'arg1': 'test', 'value': 10}
         self.assertEqual(data, expected_data)
 
         with self.assertRaises(AttributeError):
-            client.invalid_endpoint()
+            c.invalid_endpoint()
 
         test.endpoint(arg1='test')  # For 100% coverage :D
 

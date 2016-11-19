@@ -2,7 +2,7 @@ import argparse
 from wsgiref.simple_server import make_server
 from .container_api import ContainerAPI
 from .task_runner import TaskRunner
-from captaincloud.utils import bottle_utils
+from captaincloud.utils.http import bottle_api
 
 
 class Container(object):
@@ -14,7 +14,7 @@ class Container(object):
         self.port = port
         self.task_runner = TaskRunner()
         container_api = ContainerAPI(container=self)
-        self.app = bottle_utils.make_app(instance=container_api, mount='/api')
+        self.app = bottle_api.make_app(instance=container_api, mount='/api')
         self.server = make_server(self.host, self.port, self.app)
 
     def run(self):
