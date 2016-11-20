@@ -8,6 +8,9 @@ setup(
     author='Sagar Chakravarthy',
     license='MIT',
     packages=find_packages(exclude=('tests',)),
+    entry_points={'console_scripts': [
+        'cc-container = captaincloud.processes.container.container:main',
+    ]},
     install_requires=[
         'six',
         'bottle',

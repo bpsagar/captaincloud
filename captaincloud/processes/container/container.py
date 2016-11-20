@@ -8,7 +8,7 @@ from captaincloud.utils.http import bottle_api
 class Container(object):
     """Container to execute tasks"""
 
-    def __init__(self, host, port):
+    def __init__(self, host='localhost', port=25000):
         """Create a Task Runner instance and Container API"""
         self.host = host
         self.port = port
@@ -30,14 +30,15 @@ class Container(object):
         self.task_runner.stop()
 
 
-def main(host, port):
-    container = Container(host=host, port=port)
-    container.run()
-
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('host', default='localhost')
-    parser.add_argument('port')
+    parser.add_argument('--host', default='localhost')
+    parser.add_argument('--port', type=int, default=25000)
     args = parser.parse_args()
-    main(host=args.host, port=args.post)
+    container = Container(host=args.host, port=args.port)
+    try:
+        print('Starting container process')
+        container.run()
+    except KeyboardInterrupt:
+        print('Shutting down...')
+        container.stop()
