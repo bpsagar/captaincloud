@@ -7,6 +7,6 @@ from .value import (
     AnyField
 )
 from .ref import (
-    ReferenceField, ListField
+    ReferenceField, ListField, StructField
 )
 from .exc import InvalidValueException, StreamNotAvailableException

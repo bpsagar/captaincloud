@@ -1,17 +1,22 @@
-import six
-from .meta import TaskMeta
 from .registry import TaskRegistry
+from .field import StructField
 
 
-@six.add_metaclass(TaskMeta)
 class Task(object):
     """Base class for tasks"""
+
+    FIELDSETS = ['Input', 'Output']
 
     def __new__(cls, **kwargs):
         """Instantiate and set fieldsets"""
         instance = super(Task, cls).__new__(cls)
-        for name, fieldset in cls.__fieldsets__.items():
-            setattr(instance, name, fieldset())
+        for name in cls.FIELDSETS:
+            if hasattr(cls, name):
+                fields = getattr(cls, name).__dict__
+                setattr(instance, name, StructField(**fields).create())
+            else:
+                setattr(instance, name, StructField().create())
+
         return instance
 
     def __init__(self, **kwargs):
@@ -28,7 +33,7 @@ class Task(object):
         data = {
             'ID': self.ID
         }
-        for fieldset in TaskMeta.FIELDSETS:
+        for fieldset in self.FIELDSETS:
             fieldset_obj = getattr(self, fieldset)
             data[fieldset] = fieldset_obj.serialize()
         return data
@@ -37,10 +42,10 @@ class Task(object):
     def deserialize(cls, data):
         """Deserialize the data into a Task instance"""
         instance = TaskRegistry.get(id=data['ID'])()
-        for fieldset in TaskMeta.FIELDSETS:
+        for fieldset in cls.FIELDSETS:
             fields = data[fieldset]
             fieldset_obj = getattr(instance, fieldset)
-            fieldset_obj.deserialize(fields)
+            setattr(instance, fieldset, fieldset_obj.deserialize(fields))
         return instance
 
     def run(self, logger=None):

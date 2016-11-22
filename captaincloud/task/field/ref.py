@@ -63,3 +63,55 @@ class ListField(ReferenceField):
         for item in value:
             result.append(self.ref_type.deserialize(item))
         return result
+
+
+class StructValue(object):
+    def __init__(self):
+        self._field_values = {}
+        for name, field in self.__fields__.items():
+            self._field_values[name] = field.get_initial()
+
+    def serialize(self):
+        return self.struct_field.serialize(self)
+
+    @classmethod
+    def deserialize(cls, value):
+        return cls.struct_field.deserialize(value)
+
+
+class StructField(ReferenceField):
+    def __init__(self, **fields):
+        self.__fields__ = {}
+        for name, field in fields.items():
+            if isinstance(field, Field):
+                self.__fields__[name] = field
+        self._make_class()
+
+    def _make_class(self):
+        new_dct = {}
+        new_dct['__fields__'] = {}
+
+        for attr in self.__fields__:
+            field = self.__fields__.get(attr)
+            new_dct['__fields__'][attr] = field
+            new_dct[attr] = field.make_property(attr)
+        self.klass = type('StructValueInst', (StructValue,), new_dct)
+        self.klass.struct_field = self
+
+    def create(self):
+        return self.klass()
+
+    def serialize(self, value):
+        result = {}
+        print('SERIALIZE', self.__fields__)
+        for name, field in self.__fields__.items():
+            if field.is_serializable():
+                result[name] = field.serialize(getattr(value, name))
+        return result
+
+    def deserialize(self, value):
+        result = self.create()
+        for name, field in self.__fields__.items():
+            if name in value and field.is_serializable():
+                setattr(result, name, field.deserialize(value.get(name)))
+        return result
