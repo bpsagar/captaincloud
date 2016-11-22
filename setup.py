@@ -9,7 +9,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=('tests',)),
     entry_points={'console_scripts': [
-        'cc-container = captaincloud.processes.container.container:main',
+        'cc-task-runner = captaincloud.processes.task_runner.process:main',
     ]},
     install_requires=[
         'six',

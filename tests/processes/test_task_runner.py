@@ -1,5 +1,6 @@
 import unittest
-from captaincloud.processes.container import TaskRunner
+from captaincloud.processes.task_runner import TaskRunner
+
 from captaincloud.task import Task, TaskImpl, field
 from captaincloud.task.registry import TaskRegistry
 

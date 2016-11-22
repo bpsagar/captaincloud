@@ -2,17 +2,18 @@ import json
 import requests
 import multiprocessing
 import unittest
-from captaincloud.processes.container import Container
 from captaincloud.task import Task, TaskImpl, field
 from captaincloud.task.registry import TaskRegistry
-from captaincloud.processes.container.task_runner import TaskRunner
+
+from captaincloud.processes.task_runner import TaskRunner
+from captaincloud.processes.task_runner import TaskRunnerProcess
 
 
 class TestContainer(unittest.TestCase):
     """Tests for Container"""
 
     def setUp(self):
-        self.container = Container(host='localhost', port=10000)
+        self.container = TaskRunnerProcess(host='localhost', port=10000)
 
         class AddTaskImpl(TaskImpl):
             def run(self):
