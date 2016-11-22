@@ -14,7 +14,7 @@ class Container(object):
         self.port = port
         self.task_runner = TaskRunner()
         container_api = ContainerAPI(container=self)
-        self.app = bottle_api.make_app(instance=container_api, mount='/api')
+        self.app = bottle_api.make_app(('/api', container_api))
         self.server = make_server(self.host, self.port, self.app)
 
     def run(self):

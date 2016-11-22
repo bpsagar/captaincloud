@@ -55,7 +55,7 @@ class TestBottleUtils(unittest.TestCase):
 
     def test_make_app(self):
         test = self.Test2(value=10)
-        app = bottle_api.make_app(instance=test, mount='/api')
+        app = bottle_api.make_app(('/api', test))
         test_app = TestApp(app)
 
         params = {'arg1': 'test'}
@@ -78,7 +78,7 @@ class TestBottleUtils(unittest.TestCase):
 
     def test_make_client(self):
         test = self.Test2(value=10)
-        app = bottle_api.make_app(instance=test, mount='/api')
+        app = bottle_api.make_app(('/api', test))
         process = Process(
             target=app.run, kwargs={'host': 'localhost', 'port': 10001})
         process.start()

@@ -18,14 +18,17 @@ def view_wrapper(fn):
     return _inner
 
 
-def make_app(instance, mount):
+def make_app(*apps):
     """Make a bottle app from the instance"""
-    sub_app = Bottle()
-    for method_name in get_methods(instance):
-        method = getattr(instance, method_name)
-        route = '/%s/' % method_name
-        sub_app.route(route, method='POST')(view_wrapper(method))
-
     app = Bottle()
-    app.mount(mount, sub_app)
+
+    for mount, instance in apps:
+        sub_app = Bottle()
+        for method_name in get_methods(instance):
+            method = getattr(instance, method_name)
+            route = '/%s/' % method_name
+            sub_app.route(route, method='POST')(view_wrapper(method))
+
+        app.mount(mount, sub_app)
+
     return app
