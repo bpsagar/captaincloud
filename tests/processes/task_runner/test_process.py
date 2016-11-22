@@ -9,7 +9,7 @@ from captaincloud.processes.task_runner import TaskRunner
 from captaincloud.processes.task_runner import TaskRunnerProcess
 
 
-class TestContainer(unittest.TestCase):
+class TestTaskRunnerProcess(unittest.TestCase):
     """Tests for Container"""
 
     def setUp(self):
