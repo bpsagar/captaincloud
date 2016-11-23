@@ -18,6 +18,9 @@ class ReferenceField(Field):
     def is_serializable(cls):
         return True
 
+    def get(self, value):
+        return value
+
 
 class ListValue(list):
     def __init__(self, ref_type):
@@ -36,9 +39,6 @@ class ListField(ReferenceField):
 
     def get_initial(self):
         return self.create()
-
-    def get(self, value):
-        return value
 
     def set(self, value):
         val = ListValue(ref_type=self.ref_type)
@@ -100,6 +100,9 @@ class StructField(ReferenceField):
 
     def create(self):
         return self.klass()
+
+    def get_initial(self):
+        return self.create()
 
     def serialize(self, value):
         result = {}

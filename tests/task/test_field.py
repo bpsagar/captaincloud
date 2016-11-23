@@ -3,7 +3,7 @@ import unittest
 
 from captaincloud.task.field import (
     FloatField, IntegerField, StringField, ByteField, BooleanField, AnyField,
-    ListField, StreamField, StringStreamField, ByteStreamField
+    ListField, StructField, StreamField, StringStreamField, ByteStreamField
 )
 from captaincloud.task.field import (
     ValueField, InvalidValueException, StreamNotAvailableException
@@ -194,3 +194,21 @@ class TestRefFields(unittest.TestCase):
 
         with self.assertRaises(InvalidValueException):
             instance.create().append(six.u('ABC'))
+
+    def test_struct_field(self):
+        instance = StructField(a=IntegerField(), b=FloatField())
+        val = instance.create()
+        val.a = 100
+        val.b = 3.14
+        self.assertEqual(val.a, 100)
+
+        nested_instance = StructField(
+            a=IntegerField(),
+            b=StructField(
+                c=FloatField()
+            )
+        )
+        val = nested_instance.create()
+        val.a = 100
+        val.b.c = 3.14
+        print(val.serialize())
