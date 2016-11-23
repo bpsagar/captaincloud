@@ -205,10 +205,13 @@ class TestRefFields(unittest.TestCase):
         nested_instance = StructField(
             a=IntegerField(),
             b=StructField(
-                c=FloatField()
+                c=FloatField(),
+                d=StringField(default=six.u('hello world'))
             )
         )
+
         val = nested_instance.create()
         val.a = 100
         val.b.c = 3.14
-        print(val.serialize())
+        self.assertEqual(val.b.c, 3.14)
+        self.assertEqual(val.b.d, six.u('hello world'))
