@@ -103,7 +103,6 @@ class StructField(ReferenceField):
 
     def serialize(self, value):
         result = {}
-        print('SERIALIZE', self.__fields__)
         for name, field in self.__fields__.items():
             if field.is_serializable():
                 result[name] = field.serialize(getattr(value, name))
