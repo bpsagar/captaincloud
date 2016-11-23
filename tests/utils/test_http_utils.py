@@ -1,8 +1,9 @@
 import json
 import time
 import unittest
-from multiprocessing import Process
+from threading import Thread
 from webtest import TestApp
+from wsgiref.simple_server import make_server
 from captaincloud.utils.http import api
 from captaincloud.utils.http import bottle_api
 from captaincloud.utils.http import client
@@ -11,31 +12,26 @@ from captaincloud.utils.http import client
 class TestBottleUtils(unittest.TestCase):
     """Tests for bottle utils"""
 
-    def setUp(self):
-        class Test1:
-            @api.register
-            def endpoint1(self):
-                pass
+    class Test1:
+        @api.register
+        def endpoint1(self):
+            pass
 
-            @api.register
-            def endpoint2(self):
-                pass
+        @api.register
+        def endpoint2(self):
+            pass
 
-        class Test2:
-            def __init__(self, value):
-                self.value = value
+    class Test2:
+        def __init__(self, value):
+            self.value = value
 
-            @api.register
-            def endpoint(self, arg1):
-                if arg1 == 'error':
-                    raise Exception('Dummy exception')
-                return {'works': True, 'arg1': arg1, 'value': self.value}
-
-        self.Test1 = Test1
-        self.Test2 = Test2
+        @api.register
+        def endpoint(self, arg1):
+            if arg1 == 'error':
+                raise Exception('Dummy exception')
+            return {'works': True, 'arg1': arg1, 'value': self.value}
 
     def test_register_api(self):
-
         @api.register
         def dummy():
             pass
@@ -79,8 +75,9 @@ class TestBottleUtils(unittest.TestCase):
     def test_make_client(self):
         test = self.Test2(value=10)
         app = bottle_api.make_app(('/api', test))
-        process = Process(
-            target=app.run, kwargs={'host': 'localhost', 'port': 10001})
+        server = make_server('localhost', 10001, app)
+        process = Thread(
+            target=server.serve_forever)
         process.start()
 
         time.sleep(1)  # Wait for the app to run
@@ -97,4 +94,5 @@ class TestBottleUtils(unittest.TestCase):
         test.endpoint(arg1='test')  # For 100% coverage :D
 
         app.close()
-        process.terminate()
+        server.shutdown()
+        process.join()
