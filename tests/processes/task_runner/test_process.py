@@ -1,6 +1,6 @@
 import json
 import requests
-import multiprocessing
+import threading
 import unittest
 from captaincloud.task import Task, TaskImpl, field
 from captaincloud.task.registry import TaskRegistry
