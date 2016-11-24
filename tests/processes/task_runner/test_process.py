@@ -34,7 +34,7 @@ class TestTaskRunnerProcess(unittest.TestCase):
         self.AddTask = AddTask
 
     def test_container(self):
-        process = multiprocessing.Process(target=self.container.run)
+        process = threading.Thread(target=self.container.run)
         process.start()
 
         task = self.AddTask(x=10, y=20)
