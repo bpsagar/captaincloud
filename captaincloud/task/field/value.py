@@ -8,10 +8,7 @@ import six
 class ValueField(Field):
     """Base class for value field"""
 
-    def set(self, value):
-        raise NotImplementedError
-
-    def get(self, value):
+    def validate(self, value):
         raise NotImplementedError
 
     def get_initial(self):
@@ -25,13 +22,11 @@ class ValueField(Field):
     def make_property(cls, name):
         def _set(self, value):
             field = self.__fields__.get(name)
-            value = field.set(value)
-            self._field_values[name] = value
+            field.validate(value)
+            self.__values__[name] = value
 
         def _get(self):
-            field = self.__fields__.get(name)
-            value = self._field_values[name]
-            return field.get(value)
+            return self.__values__[name]
 
         return property(fget=_get, fset=_set)
 
@@ -42,20 +37,17 @@ class StringField(ValueField):
     def __init__(self, default=None, nullable=True):
         super(StringField, self).__init__()
         self._nullable = nullable
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
+    def validate(self, value):
         if value is None and self._nullable:
-            return value
+            return
         elif not isinstance(value, six.text_type):
             raise InvalidValueException('Expected a string')
-        return value
-
-    def get(self, value):
-        return value
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
 
 class ByteField(ValueField):
@@ -64,20 +56,17 @@ class ByteField(ValueField):
     def __init__(self, default=None, nullable=True):
         super(ByteField, self).__init__()
         self._nullable = nullable
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
+    def validate(self, value):
         if value is None and self._nullable:
-            return value
+            return
         elif not isinstance(value, six.binary_type):
             raise InvalidValueException('Expected bytes')
-        return value
-
-    def get(self, value):
-        return value
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
 
 class IntegerField(ValueField):
@@ -86,20 +75,17 @@ class IntegerField(ValueField):
     def __init__(self, default=None, nullable=True):
         super(IntegerField, self).__init__()
         self._nullable = nullable
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
+    def validate(self, value):
         if value is None and self._nullable:
-            return value
+            return
         elif not isinstance(value, int):
             raise InvalidValueException('Expected an integer')
-        return value
-
-    def get(self, value):
-        return value
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
 
 class FloatField(ValueField):
@@ -108,20 +94,17 @@ class FloatField(ValueField):
     def __init__(self, default=None, nullable=True):
         super(FloatField, self).__init__()
         self._nullable = nullable
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
+    def validate(self, value):
         if value is None and self._nullable:
-            return value
+            return
         elif not isinstance(value, float) and not isinstance(value, int):
             raise InvalidValueException('Expected a float')
-        return float(value)
-
-    def get(self, value):
-        return value
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
 
 class BooleanField(ValueField):
@@ -130,20 +113,17 @@ class BooleanField(ValueField):
     def __init__(self, default=None, nullable=True):
         super(BooleanField, self).__init__()
         self._nullable = nullable
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
+    def validate(self, value):
         if value is None and self._nullable:
-            return value
+            return
         elif not isinstance(value, bool):
             raise InvalidValueException('Expected a boolean')
-        return value
-
-    def get(self, value):
-        return value
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
 
 class AnyField(ValueField):
@@ -151,16 +131,14 @@ class AnyField(ValueField):
 
     def __init__(self, default=None):
         super(AnyField, self).__init__()
-        self.default = self.set(value=default)
+        self.validate(default)
+        self.default = default
 
-    def set(self, value):
-        return value
-
-    def get(self, value):
-        return value
+    def validate(self, _):
+        pass
 
     def get_initial(self):
-        return self.get(self.default)
+        return self.default
 
     def serialize(self, value):
         return pickle.dumps(value)

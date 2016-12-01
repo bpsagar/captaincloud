@@ -6,11 +6,10 @@ class ReferenceField(Field):
     def make_property(cls, name):
         def _set(self, value):
             field = self.__fields__.get(name)
-            self._field_values[name] = field.set(value)
+            self.__values__[name] = field.create(value)
 
         def _get(self):
-            field = self.__fields__.get(name)
-            return field.get(self._field_values[name])
+            return self.__values__[name]
 
         return property(fget=_get, fset=_set)
 
@@ -18,8 +17,8 @@ class ReferenceField(Field):
     def is_serializable(cls):
         return True
 
-    def get(self, value):
-        return value
+    def create(self, value=None):
+        raise NotImplementedError
 
 
 class ListValue(list):
@@ -28,7 +27,8 @@ class ListValue(list):
         self.ref_type = ref_type
 
     def append(self, item):
-        super(ListValue, self).append(self.ref_type.set(item))
+        self.ref_type.validate(item)
+        super(ListValue, self).append(item)
 
 
 class ListField(ReferenceField):
@@ -40,15 +40,9 @@ class ListField(ReferenceField):
     def get_initial(self):
         return self.create()
 
-    def set(self, value):
+    def create(self, value=None):
         val = ListValue(ref_type=self.ref_type)
-        for item in value:
-            val.append(item)
-        return val
-
-    def create(self):
-        val = ListValue(ref_type=self.ref_type)
-        for item in self.default:
+        for item in (value or self.default):
             val.append(item)
         return val
 
@@ -67,9 +61,9 @@ class ListField(ReferenceField):
 
 class StructValue(object):
     def __init__(self):
-        self._field_values = {}
+        self.__values__ = {}
         for name, field in self.__fields__.items():
-            self._field_values[name] = field.get_initial()
+            self.__values__[name] = field.get_initial()
 
     def serialize(self):
         return self.struct_field.serialize(self)
@@ -98,7 +92,7 @@ class StructField(ReferenceField):
         self.klass = type('StructValueInst', (StructValue,), new_dct)
         self.klass.struct_field = self
 
-    def create(self):
+    def create(self, value=None):
         return self.klass()
 
     def get_initial(self):

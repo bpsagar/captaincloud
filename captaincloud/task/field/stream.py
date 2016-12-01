@@ -50,7 +50,10 @@ class StreamField(Field):
         """Returns a property function for a field"""
 
         def _get(self):
-            return self._field_values[name]
+            return self.__values__[name]
+
+        def _set(self, value):
+            self.__values__[name].set_real_stream(value)
 
         return property(fget=_get)
 

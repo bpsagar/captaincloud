@@ -12,7 +12,7 @@ class TaskRegistry(object):
 
     @classmethod
     def all(cls):
-        """Returns a dictionary of registered tasks"""
+        """Returns a list of registered tasks"""
         return list(cls.TASKS.values())
 
     @classmethod

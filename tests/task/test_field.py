@@ -17,80 +17,82 @@ class TestValueFields(unittest.TestCase):
         instance = FloatField()
         self.assertEqual(instance.get_initial(), None)
 
-        self.assertEqual(instance.get(instance.set(1)), 1)
-        self.assertEqual(instance.get(instance.set(1.5)), 1.5)
-
         with self.assertRaises(InvalidValueException):
-            instance.set('ABC')
+            instance.validate('ABC')
 
         instance = FloatField(default=2.5)
         self.assertEqual(instance.get_initial(), 2.5)
+
+        instance.validate(1)
+        instance.validate(1.5)
 
     def test_integer_field(self):
         instance = IntegerField()
         self.assertEqual(instance.get_initial(), None)
 
-        self.assertEqual(instance.get(instance.set(1)), 1)
+        with self.assertRaises(InvalidValueException):
+            instance.validate(1.5)
 
         with self.assertRaises(InvalidValueException):
-            instance.set(1.5)
-
-        with self.assertRaises(InvalidValueException):
-            instance.set('ABC')
+            instance.validate('ABC')
 
         instance = IntegerField(default=2)
         self.assertEqual(instance.get_initial(), 2)
+        instance.validate(1)
 
     def test_string_field(self):
         instance = StringField()
         self.assertEqual(instance.get_initial(), None)
 
-        self.assertEqual(instance.get(instance.set(six.u('ABC'))), six.u('ABC'))
+        with self.assertRaises(InvalidValueException):
+            instance.validate(1)
 
         with self.assertRaises(InvalidValueException):
-            instance.set(1)
+            instance.validate(1.5)
 
         with self.assertRaises(InvalidValueException):
-            instance.set(1.5)
-
-        with self.assertRaises(InvalidValueException):
-            instance.set(six.b('ABC'))
+            instance.validate(six.b('ABC'))
 
         instance = StringField(default=six.u('ABC'))
         self.assertEqual(instance.get_initial(), six.u('ABC'))
+
+        instance.validate(six.u('hello'))
 
     def test_byte_field(self):
         instance = ByteField()
         self.assertEqual(instance.get_initial(), None)
 
-        self.assertEqual(instance.get(instance.set(six.b('ABC'))), six.b('ABC'))
+        with self.assertRaises(InvalidValueException):
+            instance.validate(1)
 
         with self.assertRaises(InvalidValueException):
-            instance.set(1)
+            instance.validate(1.5)
 
         with self.assertRaises(InvalidValueException):
-            instance.set(1.5)
-
-        with self.assertRaises(InvalidValueException):
-            instance.set(six.u('ABC'))
+            instance.validate(six.u('ABC'))
 
         instance = ByteField(default=six.b('ABC'))
         self.assertEqual(instance.get_initial(), six.b('ABC'))
+
+        instance.validate(six.b('hello'))
 
     def test_boolean_field(self):
         instance = BooleanField(default=False)
         self.assertEqual(instance.get_initial(), False)
 
         with self.assertRaises(InvalidValueException):
-            instance.set('True')
+            instance.validate('True')
 
         instance = BooleanField()
-        self.assertEqual(instance.get(instance.set(True)), True)
+        instance.validate(True)
+        instance.validate(False)
 
     def test_any_field(self):
         instance = AnyField(default='hello')
         self.assertEqual(instance.get_initial(), 'hello')
-        self.assertEqual(instance.get(instance.set(True)), True)
+
+        instance.validate(100)
+        instance.validate('Hello')
 
     def test_new_field(self):
         class NewField(ValueField):
@@ -98,11 +100,7 @@ class TestValueFields(unittest.TestCase):
 
         with self.assertRaises(NotImplementedError):
             instance = NewField()
-            instance.set(10)
-
-        with self.assertRaises(NotImplementedError):
-            instance = NewField()
-            instance.get(100)
+            instance.validate(10)
 
         with self.assertRaises(NotImplementedError):
             instance = NewField()
@@ -183,7 +181,7 @@ class TestRefFields(unittest.TestCase):
         val.append(six.u('ABC'))
         self.assertEqual(val, [six.u('XYZ'), six.u('ABC')])
 
-        val = instance.set([six.u('A'), six.u('B'), six.u('C')])
+        val = instance.create([six.u('A'), six.u('B'), six.u('C')])
         self.assertEqual(val, [six.u('A'), six.u('B'), six.u('C')])
 
         self.assertEqual(val.pop(), six.u('C'))
