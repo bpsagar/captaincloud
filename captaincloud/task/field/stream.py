@@ -23,6 +23,11 @@ class Stream(object):
         self.validate(data)
         return self.real_stream.write(self.serialize(data))
 
+    def close(self):
+        if self.real_stream is None:
+            raise StreamNotAvailableException()
+        self.real_stream.close()
+
     def validate(self, data):
         if not isinstance(data, self.stream_type):
             raise InvalidValueException()
@@ -55,7 +60,7 @@ class StreamField(Field):
         def _set(self, value):
             self.__values__[name].set_real_stream(value)
 
-        return property(fget=_get)
+        return property(fget=_get, fset=_set)
 
 
 class StringStreamField(StreamField):
