@@ -1,6 +1,7 @@
 from .base import Field
 from .exc import InvalidValueException
 
+import base64
 import pickle
 import six
 
@@ -67,6 +68,12 @@ class ByteField(ValueField):
 
     def get_initial(self):
         return self.default
+
+    def serialize(self, value):
+        pass
+
+    def deserialize(self, value):
+        pass
 
 
 class IntegerField(ValueField):
@@ -141,7 +148,7 @@ class AnyField(ValueField):
         return self.default
 
     def serialize(self, value):
-        return pickle.dumps(value)
+        return six.u(base64.b64encode(pickle.dumps(value)))
 
     def deserialize(self, value):
-        return pickle.loads(value)
+        return pickle.loads(base64.b64decode(value))

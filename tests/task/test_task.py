@@ -1,3 +1,4 @@
+import base64
 import pickle
 import six
 import unittest
@@ -80,7 +81,7 @@ class TestFields(unittest.TestCase):
                 'string': six.u('ABCD'),
                 'integer': 5,
                 'integer_array': [],
-                'anyf': pickle.dumps({1: 2})
+                'anyf': six.u(base64.b64encode(pickle.dumps({1: 2})))
             },
             'Output': {
                 'floating': 1.5,
@@ -101,7 +102,7 @@ class TestFields(unittest.TestCase):
                 'string': six.u('XYZ'),
                 'integer': 10,
                 'integer_array': [1, 2, 3],
-                'anyf': pickle.dumps(['hello', 'world'])
+                'anyf': six.u(base64.b64encode(pickle.dumps(['hello', 'world'])))
             },
             'Output': {
                 'floating': 2.5,
@@ -117,7 +118,7 @@ class TestFields(unittest.TestCase):
                 'string': six.u('ABCD'),
                 'integer': 5,
                 'integer_array': [1, 2, 3],
-                'anyf': pickle.dumps(100)
+                'anyf': six.u(base64.b64encode(pickle.dumps(100)))
             },
             'Output': {
                 'floating': 1.5,
