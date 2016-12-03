@@ -1,4 +1,8 @@
+from captaincloud.task import Task
+
+import json
 import logging
+import sys
 import uuid
 
 
@@ -15,17 +19,39 @@ class TaskExecutorStatus(object):
 
 
 class TaskExecutor(object):
-    def __init__(self, task, context=None, settings=None):
-        self.task = task
-        self.impl = task.get_impl()
-        self.context = context or dict()
-        self.settings = settings or dict()
-
+    def __init__(self, workdir='.'):
         self.uuid = str(uuid.uuid4())
         self.logger = logging.getLogger('TaskExecutor')
 
         self.state = TaskExecutorState.NOT_STARTED
         self.status = TaskExecutorStatus.UNKNOWN
+
+    def set_task(self, task):
+        self.task = task
+        self.impl = self.task.get_impl()
+
+    def load_task(self, task_in):
+        if task_in == 'stdin':
+            fd = sys.stdin
+        else:
+            fd = open(task_in, 'r')
+        try:
+            task_data = json.load(fd)
+            self.task = Task.deserialize(task_data)
+            self.impl = self.task.get_impl()
+            fd.close()
+            return self.task
+        except json.decoder.JSONDecodeError:
+            fd.close()
+            raise Exception('Unable to load task data.')
+
+    def dump_task(self, task_out):
+        if task_out == 'stdout':
+            fd = sys.stdout
+        else:
+            fd = open(task_out, 'w')
+        json.dump(self.task.serialize(), fd)
+        fd.close()
 
     def execute(self):
         """Execute the task"""

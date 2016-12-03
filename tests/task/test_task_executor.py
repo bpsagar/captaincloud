@@ -64,10 +64,12 @@ class TestTaskExecutor(unittest.TestCase):
         task2.Input.a = 100
         task2.Input.b = 200
 
-        executor1 = TaskExecutor(task=task1)
+        executor1 = TaskExecutor()
+        executor1.set_task(task1)
         executor1.execute()
 
-        executor2 = TaskExecutor(task=task2)
+        executor2 = TaskExecutor()
+        executor2.set_task(task2)
         executor2.execute()
 
         self.assertEqual(task1.Output.c, 30)
@@ -81,7 +83,8 @@ class TestTaskExecutor(unittest.TestCase):
         task.Input.stream = open('test.tmp', 'rb')
         task.Output.stream = open('test.out', 'wb')
 
-        executor = TaskExecutor(task=task)
+        executor = TaskExecutor()
+        executor.set_task(task)
         executor.execute()
 
         with open('test.out', 'rb') as fd:
